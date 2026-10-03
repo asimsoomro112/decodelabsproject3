@@ -1,0 +1,585 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CourseVault design system — LIQUID GLASS + GLASSMORPHISM 2.0
+   Dark-first, cinematic, premium. Light theme via
+   prefers-color-scheme. All color as oklch CSS variables;
+   tints derived with relative color syntax / color-mix.
+   ============================================================ */
+
+@theme {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-graphite: #0b0d12;
+  --color-indigo-glow: #6366f1;
+  --color-amber-vault: #f59e0b;
+  --color-emerald-mint: #34d399;
+  --color-violet-shield: #a855f7;
+  --color-rose-alert: #fb7185;
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Palette (oklch) */
+  --bg: oklch(0.155 0.013 285); /* #0b0d12 graphite */
+  --bg-2: oklch(0.2 0.016 285);
+  --ink: oklch(0.93 0.008 285);
+  --muted: oklch(0.66 0.02 285);
+  --faint: oklch(0.5 0.02 285);
+  --indigo: oklch(0.585 0.204 277); /* #6366f1 */
+  --amber: oklch(0.77 0.164 70); /* #f59e0b vault amber */
+  --emerald: oklch(0.77 0.171 165); /* #34d399 */
+  --violet: oklch(0.63 0.24 304); /* #a855f7 shield violet */
+  --rose: oklch(0.71 0.168 13); /* #fb7185 */
+
+  /* Glass recipe tokens */
+  --glass-fill: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.1),
+    rgb(255 255 255 / 0.03) 45%,
+    rgb(0 0 0 / 0.1)
+  );
+  --glass-fill-2: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.14),
+    rgb(255 255 255 / 0.05) 45%,
+    rgb(0 0 0 / 0.16)
+  );
+  --glass-fill-3: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.18),
+    rgb(255 255 255 / 0.07) 45%,
+    rgb(0 0 0 / 0.2)
+  );
+  --glass-border: rgb(255 255 255 / 0.14);
+  --panel-bg: color-mix(in oklch, var(--bg) 80%, black);
+  --input-bg: rgb(255 255 255 / 0.05);
+  --shadow-soft: 0 24px 60px -12px rgb(0 0 0 / 0.55);
+  --shadow-soft-2: 0 32px 80px -16px rgb(0 0 0 / 0.65);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: oklch(0.965 0.006 285);
+    --bg-2: oklch(0.94 0.008 285);
+    --ink: oklch(0.24 0.02 285);
+    --muted: oklch(0.46 0.02 285);
+    --faint: oklch(0.6 0.02 285);
+    --glass-fill: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.7),
+      rgb(255 255 255 / 0.28) 45%,
+      rgb(99 102 241 / 0.07)
+    );
+    --glass-fill-2: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.8),
+      rgb(255 255 255 / 0.35) 45%,
+      rgb(99 102 241 / 0.09)
+    );
+    --glass-fill-3: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.92),
+      rgb(255 255 255 / 0.5) 45%,
+      rgb(99 102 241 / 0.12)
+    );
+    --glass-border: rgb(15 18 30 / 0.14);
+    --panel-bg: oklch(0.985 0.004 285);
+    --input-bg: rgb(15 18 30 / 0.045);
+    --shadow-soft: 0 24px 60px -12px rgb(30 35 70 / 0.22);
+    --shadow-soft-2: 0 32px 80px -16px rgb(30 35 70 / 0.28);
+  }
+}
+
+/* ---------- base ---------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  overflow-x: clip; /* no horizontal scroll, ever */
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--indigo) 55%, transparent);
+  color: oklch(0.98 0.004 285);
+}
+
+:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Refined scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted) 45%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Skip link */
+.skip-link {
+  position: fixed;
+  top: -120px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--indigo);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+/* ---------- glass recipe ---------- */
+/* Glass is for CHROME ONLY (nav, cards, dialogs, drawers, toasts).
+   Long text / data tables use .panel (near-opaque). Max ~4 large
+   glass surfaces on screen at once. */
+
+.glass,
+.glass-2,
+.glass-3 {
+  position: relative;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  /* light-catcher border + inset top-left highlight + inner bottom-right shadow */
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.12),
+    inset -2px -2px 6px rgb(0 0 0 / 0.18),
+    var(--shadow-soft);
+}
+
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+}
+
+.glass-2 {
+  background: var(--glass-fill-2);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.14),
+    inset -2px -2px 8px rgb(0 0 0 / 0.22),
+    var(--shadow-soft-2);
+}
+
+.glass-3 {
+  background: var(--glass-fill-3);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.18),
+    inset -2px -2px 10px rgb(0 0 0 / 0.25),
+    var(--shadow-soft-2);
+}
+
+.pill {
+  border-radius: 999px;
+}
+
+/* Pointer-following specular highlight.
+   JS updates --mx / --my on pointermove via rAF (see lib/fx.ts useSpecular).
+   Add .specular to the .glass element you want it on. */
+.glass.specular::before,
+.glass-2.specular::before,
+.glass-3.specular::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    480px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(255 255 255 / 0.13),
+    transparent 62%
+  );
+}
+
+/* Liquid refraction approximation — Chromium only.
+   An inline SVG filter (feTurbulence + feDisplacementMap, #liquid in
+   index.html) combined with the standard blur. This is a visual
+   approximation, NOT true optical refraction. Safari/Firefox keep the
+   normal glass recipe via the @supports guard below. */
+@supports (backdrop-filter: url(#liquid)) {
+  .liquid {
+    -webkit-backdrop-filter: url(#liquid) blur(16px) saturate(170%);
+    backdrop-filter: url(#liquid) blur(16px) saturate(170%);
+  }
+}
+
+/* No backdrop-filter at all → solid surfaces */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  .glass-2,
+  .glass-3,
+  .liquid {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--panel-bg);
+  }
+}
+
+/* User asked for less transparency → solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-2,
+  .glass-3,
+  .liquid {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--panel-bg);
+  }
+  .glass.specular::before,
+  .glass-2.specular::before,
+  .glass-3.specular::before {
+    display: none;
+  }
+}
+
+/* High contrast → stronger borders */
+@media (prefers-contrast: more) {
+  .glass,
+  .glass-2,
+  .glass-3,
+  .panel,
+  .input {
+    border-width: 2px;
+  }
+}
+
+/* Near-opaque panel for data tables + long text (never glass) */
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---------- form controls ---------- */
+
+.input {
+  width: 100%;
+  border-radius: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  padding: 10px 12px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.input::placeholder {
+  color: var(--faint);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--indigo) 28%, transparent);
+}
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+select.input option {
+  background: var(--panel-bg);
+  color: var(--ink);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  min-height: 44px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--indigo), color-mix(in oklch, var(--indigo) 70%, var(--violet)));
+  color: white;
+  box-shadow: 0 10px 30px -8px color-mix(in oklch, var(--indigo) 65%, transparent);
+}
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 14px 36px -8px color-mix(in oklch, var(--indigo) 80%, transparent);
+}
+.btn-ghost {
+  background: var(--input-bg);
+  border-color: var(--glass-border);
+  color: var(--ink);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--indigo) 55%, transparent);
+}
+.btn-danger {
+  background: linear-gradient(135deg, var(--rose), color-mix(in oklch, var(--rose) 70%, #dc2626));
+  color: white;
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* ---------- chips / badges ---------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--glass-border);
+  background: var(--input-bg);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chip-pk {
+  color: var(--amber);
+  border-color: color-mix(in oklch, var(--amber) 45%, transparent);
+}
+.chip-fk {
+  color: var(--indigo);
+  border-color: color-mix(in oklch, var(--indigo) 45%, transparent);
+}
+.chip-unique {
+  color: var(--violet);
+  border-color: color-mix(in oklch, var(--violet) 45%, transparent);
+}
+.chip-check {
+  color: var(--emerald);
+  border-color: color-mix(in oklch, var(--emerald) 45%, transparent);
+}
+.chip-notnull {
+  color: var(--ink);
+}
+
+/* ---------- skeletons ---------- */
+
+.skeleton {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgb(128 128 128 / 0.08) 25%,
+    rgb(128 128 128 / 0.18) 50%,
+    rgb(128 128 128 / 0.08) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: -400px 0;
+  }
+  to {
+    background-position: 400px 0;
+  }
+}
+
+/* ---------- keyframes ---------- */
+
+/* Slow Ken Burns drift for the optional /media/bg.mp4 layer */
+.kenburns {
+  animation: kenburns 44s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes kenburns {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.12) translate(-1.5%, 1%);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(52 211 153 / 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes vault-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-2.5deg);
+  }
+  40% {
+    transform: rotate(2deg);
+  }
+  60% {
+    transform: rotate(-1.5deg);
+  }
+  80% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ---------- view transitions ---------- */
+/* Route changes: blur + fade + 12px rise, 400ms, cubic-bezier(.22,1,.36,1) */
+::view-transition-old(root) {
+  animation: vt-old 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+::view-transition-new(root) {
+  animation: vt-new 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes vt-old {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(-12px);
+  }
+}
+@keyframes vt-new {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ---------- scroll-driven reveals ---------- */
+/* Default state is VISIBLE (no-JS / no-support safe). Inside @supports,
+   elements animate in as they enter the viewport. */
+[data-reveal] {
+  opacity: 1;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+  }
+}
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- layout guards ---------- */
+
+/* Mobile bottom tab bar clearance */
+@media (max-width: 767px) {
+  main#main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* 8px grid gutters, 16px page gutters */
+.page {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+  [data-reveal] {
+    animation: none;
+    opacity: 1;
+  }
+}

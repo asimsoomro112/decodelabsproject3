@@ -1,0 +1,21 @@
+{
+  "description": "CourseVault — DecodeLabs Industrial Training Kit (Batch 2026), Project 3: Database Integration",
+  "name": "coursevault",
+  "private": true,
+  "scripts": {
+    "build": "npm --workspace=coursevault-client run build && npm --workspace=coursevault-server run build",
+    "db:migrate": "npm --workspace=coursevault-server run db:migrate",
+    "db:reset": "npm --workspace=coursevault-server run db:reset",
+    "db:seed": "npm --workspace=coursevault-server run db:seed",
+    "dev": "npm --workspace=coursevault-server run dev",
+    "dev:all": "npm --workspace=coursevault-server run dev & npm --workspace=coursevault-client run dev",
+    "start": "npm --workspace=coursevault-server run start",
+    "test": "npm --workspace=coursevault-server run test"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "workspaces": [
+    "server",
+    "client"
+  ]
+}

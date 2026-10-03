@@ -1,0 +1,25 @@
+# CourseVault — local Postgres for development and tests.
+# Start:  docker compose up -d
+# Stop:   docker compose down        (add -v to drop the pgdata volume)
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: coursevault-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coursevault
+      POSTGRES_PASSWORD: coursevault
+      POSTGRES_DB: coursevault
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coursevault -d coursevault"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  pgdata:

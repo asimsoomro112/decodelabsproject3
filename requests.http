@@ -1,0 +1,201 @@
+# CourseVault API — every endpoint. VS Code REST Client / IntelliJ format.
+# Fill in @userId / @instructorId / @courseId from the Location headers.
+@baseUrl = http://localhost:4000/api/v1
+@userId = 00000000-0000-0000-0000-000000000000
+@instructorId = 00000000-0000-0000-0000-000000000000
+@courseId = 00000000-0000-0000-0000-000000000000
+
+### Health — liveness
+GET {{baseUrl}}/health
+
+### Ready — runs SELECT 1
+GET {{baseUrl}}/ready
+
+### OpenAPI document
+GET http://localhost:4000/openapi.json
+
+### Scalar reference (open in a browser)
+# GET http://localhost:4000/reference
+
+### ---- Users ----
+
+### List users (paginated)
+GET {{baseUrl}}/users?page=1&limit=5
+
+### List users with filters + SQL inspector
+GET {{baseUrl}}/users?role=instructor&q=ada&page=1&limit=10&inspect=1
+
+### Create a user -> 201 + Location
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Sara Ahmed",
+  "email": "sara@example.com",
+  "role": "instructor"
+}
+
+### Get a user with profile
+GET {{baseUrl}}/users/{{userId}}
+
+### Replace a user (PUT = full UPDATE)
+PUT {{baseUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "Sara Khan",
+  "email": "sara.khan@example.com",
+  "role": "instructor"
+}
+
+### Patch a user (PATCH = partial UPDATE)
+PATCH {{baseUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "Sara Qureshi"
+}
+
+### Delete a user -> 204 (409 if instructor still has courses)
+DELETE {{baseUrl}}/users/{{userId}}
+
+### ---- Profiles (1:1) ----
+
+### Get a profile
+GET {{baseUrl}}/users/{{userId}}/profile
+
+### Upsert a profile (PUT = INSERT ... ON CONFLICT DO UPDATE)
+PUT {{baseUrl}}/users/{{userId}}/profile
+Content-Type: application/json
+
+{
+  "bio": "PostgreSQL enthusiast.",
+  "country": "Pakistan",
+  "age": 24
+}
+
+### Upsert with an invalid age -> 422 from the DB CHECK (final source of truth)
+PUT {{baseUrl}}/users/{{userId}}/profile
+Content-Type: application/json
+
+{
+  "age": 200
+}
+
+### ---- Courses ----
+
+### List courses
+GET {{baseUrl}}/courses?page=1&limit=5
+
+### List courses with filters + SQL inspector
+GET {{baseUrl}}/courses?level=beginner&q=sql&inspect=1
+
+### Create a course -> 201 + Location
+POST {{baseUrl}}/courses
+Content-Type: application/json
+
+{
+  "instructorId": "{{instructorId}}",
+  "title": "PostgreSQL Fundamentals",
+  "description": "Tables, keys, constraints and JOINs.",
+  "level": "beginner",
+  "seats": 40,
+  "startDate": "2026-11-10"
+}
+
+### Get a course with instructor + enrolledCount
+GET {{baseUrl}}/courses/{{courseId}}
+
+### Replace a course
+PUT {{baseUrl}}/courses/{{courseId}}
+Content-Type: application/json
+
+{
+  "instructorId": "{{instructorId}}",
+  "title": "PostgreSQL Fundamentals",
+  "description": "Updated description.",
+  "level": "intermediate",
+  "seats": 30,
+  "startDate": "2026-11-10"
+}
+
+### Patch a course
+PATCH {{baseUrl}}/courses/{{courseId}}
+Content-Type: application/json
+
+{
+  "seats": 35
+}
+
+### Delete a course -> 204 (enrollments cascade)
+DELETE {{baseUrl}}/courses/{{courseId}}
+
+### ---- Enrollments (M:M junction) ----
+
+### Course roster with learner details
+GET {{baseUrl}}/courses/{{courseId}}/enrollments
+
+### Enroll a learner -> 201 + Location (409 when full or duplicate)
+POST {{baseUrl}}/courses/{{courseId}}/enrollments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+### Remove an enrollment -> 204
+DELETE {{baseUrl}}/courses/{{courseId}}/enrollments/{{userId}}
+
+### A learner's enrollments with course details
+GET {{baseUrl}}/users/{{userId}}/enrollments
+
+### ---- Aggregates & introspection ----
+
+### Dashboard stats (JOIN + GROUP BY)
+GET {{baseUrl}}/stats
+
+### Schema introspection for the ER diagram
+GET {{baseUrl}}/schema
+
+### ---- Injection lab ----
+
+### Naive (display only) vs parameterized (executed)
+POST {{baseUrl}}/lab/injection-demo
+Content-Type: application/json
+
+{
+  "input": "' OR '1'='1"
+}
+
+### Classic bypass attempt
+POST {{baseUrl}}/lab/injection-demo
+Content-Type: application/json
+
+{
+  "input": "' OR 1=1 --"
+}
+
+### Stacked-query attempt
+POST {{baseUrl}}/lab/injection-demo
+Content-Type: application/json
+
+{
+  "input": "'; DROP TABLE users; --"
+}
+
+### ---- Error shapes ----
+
+### Malformed UUID -> 400 problem+json
+GET {{baseUrl}}/users/not-a-uuid
+
+### Unknown id -> 404 problem+json
+GET {{baseUrl}}/users/123e4567-e89b-12d3-a456-426614174000
+
+### Unknown route -> 404 problem+json
+GET {{baseUrl}}/does-not-exist
+
+### Validation failure -> 400 problem+json
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{}
