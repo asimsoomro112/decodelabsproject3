@@ -13,8 +13,9 @@ healthRouter.get('/health', (_req, res) => {
 healthRouter.get('/ready', async (_req, res) => {
   try {
     await query('SELECT 1');
-  } catch {
-    throw serviceUnavailable('Database is not reachable.');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw serviceUnavailable(`Database is not reachable: ${msg}`);
   }
   res.json({ status: 'ready' });
 });
