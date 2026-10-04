@@ -94,3 +94,7 @@ export function createApp(): express.Express {
 
   return app;
 }
+
+// Export default app for Vercel Serverless Functions
+const app = createApp();
+export default app;
