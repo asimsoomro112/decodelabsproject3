@@ -254,43 +254,45 @@ export default function Security() {
 
       {/* split view */}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <div className="glass border-rose-400/30 p-5 sm:p-6" data-reveal aria-label="Vulnerable pattern">
+        <div className="glass border-[color-mix(in_oklch,var(--rose)_30%,transparent)] p-5 sm:p-6" data-reveal aria-label="Vulnerable pattern">
           <div className="flex items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-display text-base font-bold">
-              <TriangleAlert size={17} className="text-rose-400" aria-hidden="true" />
+              <TriangleAlert size={17} className="text-[var(--rose)]" aria-hidden="true" />
               Vulnerable pattern
             </h2>
-            <span className="chip !border-rose-400/50 !text-rose-300">displayed — never executed</span>
+            <span className="chip !border-[color-mix(in_oklch,var(--rose)_50%,transparent)] !text-[var(--rose)]">displayed — never executed</span>
           </div>
-          <pre className="mt-4 overflow-x-auto rounded-2xl border border-rose-400/25 bg-rose-950/30 p-4 font-mono text-[13px] leading-relaxed">
-            <code className="text-rose-100/90">
+          <pre className="mt-4 overflow-x-auto rounded-2xl border border-[color-mix(in_oklch,var(--rose)_25%,transparent)] bg-[color-mix(in_oklch,var(--rose)_10%,transparent)] p-4 font-mono text-[13px] leading-relaxed">
+            <code className="text-[var(--ink)] opacity-90 font-bold">
               {naive.split(payload).map((part, i, arr) => (
                 <span key={i}>
                   {part}
                   {i < arr.length - 1 && payload !== "" && (
-                    <mark className="rounded bg-rose-500/40 px-0.5 text-rose-100">{payload}</mark>
+                    <mark className="rounded bg-[color-mix(in_oklch,var(--rose)_30%,transparent)] px-0.5 text-[var(--rose)]">{payload}</mark>
                   )}
                 </span>
               ))}
             </code>
           </pre>
-          <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-rose-200/90">
-            <TriangleAlert size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
-            String concatenation lets the payload rewrite the query — this would return{" "}
-            <strong>every row</strong> in users, or worse. It never reaches Postgres here.
+          <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-[var(--ink)] opacity-80">
+            <TriangleAlert size={15} className="mt-0.5 shrink-0 text-[var(--rose)]" aria-hidden="true" />
+            <span>
+              String concatenation lets the payload rewrite the query — this would return{" "}
+              <strong>every row</strong> in users, or worse. It never reaches Postgres here.
+            </span>
           </p>
         </div>
 
-        <div className="glass border-emerald-400/30 p-5 sm:p-6" data-reveal aria-label="Parameterized query">
+        <div className="glass border-[color-mix(in_oklch,var(--emerald)_30%,transparent)] p-5 sm:p-6" data-reveal aria-label="Parameterized query">
           <div className="flex items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-display text-base font-bold">
-              <ShieldCheck size={17} className="text-emerald-400" aria-hidden="true" />
+              <ShieldCheck size={17} className="text-[var(--emerald)]" aria-hidden="true" />
               Parameterized query
             </h2>
             <span className="chip chip-check">executed safely</span>
           </div>
-          <pre className="mt-4 overflow-x-auto rounded-2xl border border-emerald-400/25 bg-emerald-950/25 p-4 font-mono text-[13px] leading-relaxed">
-            <code className="text-emerald-100/90">
+          <pre className="mt-4 overflow-x-auto rounded-2xl border border-[color-mix(in_oklch,var(--emerald)_25%,transparent)] bg-[color-mix(in_oklch,var(--emerald)_10%,transparent)] p-4 font-mono text-[13px] leading-relaxed">
+            <code className="text-[var(--ink)] opacity-90 font-bold">
               {`SELECT id, name, email\nFROM users\nWHERE email ILIKE $1;`}
             </code>
           </pre>

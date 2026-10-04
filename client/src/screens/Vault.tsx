@@ -32,7 +32,7 @@ function DbStatusChip() {
     const check = async () => {
       try {
         const r = await api.ready();
-        if (alive) setStatus(r.ready ? "up" : "down");
+        if (alive) setStatus(r.status === "ready" ? "up" : "down");
       } catch {
         if (alive) setStatus("down");
       }

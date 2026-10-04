@@ -26,12 +26,12 @@ interface Group {
   endpoints: Endpoint[];
 }
 
-const METHOD_STYLE: Record<Endpoint["method"], string> = {
-  GET: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300",
-  POST: "border-indigo-400/40 bg-indigo-400/10 text-indigo-300",
-  PUT: "border-amber-400/40 bg-amber-400/10 text-amber-300",
-  PATCH: "border-violet-400/40 bg-violet-400/10 text-violet-300",
-  DELETE: "border-rose-400/40 bg-rose-400/10 text-rose-300",
+const METHOD_COLOR: Record<Endpoint["method"], string> = {
+  GET: "var(--emerald)",
+  POST: "var(--indigo)",
+  PUT: "var(--amber)",
+  PATCH: "var(--violet)",
+  DELETE: "var(--rose)",
 };
 
 const GROUPS: Group[] = [
@@ -155,14 +155,21 @@ export default function Docs() {
               <g.icon size={18} className="text-indigo-300" aria-hidden="true" />
               {g.title}
             </h2>
-            <ul className="panel divide-y divide-white/5 overflow-hidden">
+            <ul className="panel flex flex-col gap-2 p-2 overflow-hidden">
               {g.endpoints.map((e) => (
-                <li key={e.method + e.path} className="flex flex-col gap-1.5 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4">
-                  <span className={"chip shrink-0 !text-[11px] " + METHOD_STYLE[e.method]}>
+                <li key={e.method + e.path} className="group flex flex-col gap-2 px-4 py-3 rounded-xl bg-[var(--input-bg)] border border-[var(--glass-border)] hover:bg-[var(--hover-bg)] hover:-translate-y-[1px] hover:shadow-md transition-all duration-200 sm:flex-row sm:items-center sm:gap-4 cursor-default">
+                  <span 
+                    className="chip shrink-0 !text-[11px] font-bold tracking-widest shadow-sm"
+                    style={{
+                      color: METHOD_COLOR[e.method],
+                      borderColor: `color-mix(in oklch, ${METHOD_COLOR[e.method]} 30%, transparent)`,
+                      backgroundColor: `color-mix(in oklch, ${METHOD_COLOR[e.method]} 12%, transparent)`,
+                    }}
+                  >
                     {e.method}
                   </span>
-                  <code className="shrink-0 font-mono text-[13px] text-indigo-200">{e.path}</code>
-                  <span className="text-sm leading-relaxed text-[var(--muted)]">{e.desc}</span>
+                  <code className="shrink-0 font-mono font-bold text-[13.5px] text-[var(--indigo)]">{e.path}</code>
+                  <span className="text-[13px] leading-relaxed text-[var(--muted)] group-hover:text-[var(--ink)] transition-colors">{e.desc}</span>
                 </li>
               ))}
             </ul>

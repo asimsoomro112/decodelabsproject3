@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
+import { useLocation } from "react-router";
+import { useTheme } from "./ThemeProvider";
 
 /* ============================================================
    "The data vault" — fixed full-viewport canvas behind everything.
@@ -520,10 +523,89 @@ export default function Background() {
     };
   }, []);
 
+  const { scrollYProgress } = useScroll();
+  const pathLength = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  const location = useLocation();
+  const { actualTheme } = useTheme();
+  const isLight = actualTheme === "light";
+
+  const getRouteConfig = () => {
+    switch (location.pathname) {
+      case "/schema":
+        return { 
+          color: "#10b981", 
+          glow1: `radial-gradient(circle at 20% 50%, rgba(16,185,129,${isLight ? 0.3 : 0.15}), transparent 50%)`,
+          glow2: `radial-gradient(circle at 80% 80%, rgba(52,211,153,${isLight ? 0.2 : 0.1}), transparent 50%)`,
+          paths: ["M 250,0 L 250,400 L 100,600 L 400,800 L 250,1100"],
+          extra: (
+            <svg className={`absolute inset-0 w-full h-full ${isLight ? "opacity-40" : "opacity-20"}`} preserveAspectRatio="xMidYMid slice" viewBox="0 0 1000 1000">
+              <defs><pattern id="schema-grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="#10b981" strokeWidth="1" strokeDasharray="4 4" /></pattern></defs>
+              <rect width="100%" height="100%" fill="url(#schema-grid)" />
+              <circle cx="20%" cy="30%" r="4" fill="#10b981" className="animate-pulse" />
+              <circle cx="80%" cy="70%" r="4" fill="#10b981" className="animate-pulse" />
+              <circle cx="40%" cy="60%" r="6" fill="#10b981" className="animate-bounce" />
+            </svg>
+          )
+        };
+      case "/studio":
+        return { 
+          color: "#f59e0b", 
+          glow1: `radial-gradient(circle at 80% 20%, rgba(245,158,11,${isLight ? 0.3 : 0.15}), transparent 50%)`,
+          glow2: `radial-gradient(circle at 20% 80%, rgba(251,191,36,${isLight ? 0.2 : 0.1}), transparent 50%)`,
+          paths: ["M 0,800 Q 250,800 250,500 T 500,200"],
+          extra: (
+            <div className={`absolute inset-0 flex items-end justify-around px-20 ${isLight ? "opacity-20" : "opacity-10"}`}>
+              {[40, 75, 45, 90, 60, 85, 30, 65].map((h, i) => (
+                 <div key={i} className="w-16 bg-gradient-to-t from-amber-500 to-transparent rounded-t-sm" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          )
+        };
+      case "/security":
+        return { 
+          color: "#ef4444", 
+          glow1: `radial-gradient(circle at 50% 20%, rgba(239,68,68,${isLight ? 0.3 : 0.15}), transparent 50%)`,
+          glow2: `radial-gradient(circle at 50% 80%, rgba(248,113,113,${isLight ? 0.2 : 0.1}), transparent 50%)`,
+          paths: ["M 0,200 Q 250,600 500,200"],
+          extra: (
+             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none ${isLight ? "opacity-20" : "opacity-10"}`}>
+                <div className="w-[80vw] h-[80vw] rounded-full border-[2px] border-red-500 animate-[ping_6s_linear_infinite]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] rounded-full border-[4px] border-red-500 animate-[ping_4s_linear_infinite]" />
+             </div>
+          )
+        };
+      case "/docs":
+        return { 
+          color: "#06b6d4", 
+          glow1: `radial-gradient(circle at 30% 30%, rgba(6,182,212,${isLight ? 0.3 : 0.15}), transparent 50%)`,
+          glow2: `radial-gradient(circle at 70% 70%, rgba(59,130,246,${isLight ? 0.2 : 0.1}), transparent 50%)`,
+          paths: ["M 100,0 L 100,1000", "M 400,0 L 400,1000"],
+          extra: (
+            <div className={`absolute inset-0 flex flex-col justify-around py-32 px-20 ${isLight ? "opacity-30" : "opacity-10"}`}>
+              {[...Array(12)].map((_, i) => (
+                 <div key={i} className="h-1 bg-cyan-500 rounded-full" style={{ width: `${Math.random() * 40 + 10}%`, marginLeft: `${Math.random() * 20}%` }} />
+              ))}
+            </div>
+          )
+        };
+      default: // Vault
+        return { 
+          color: "#8b5cf6", 
+          glow1: `radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,${isLight ? 0.3 : 0.15}), transparent)`,
+          glow2: `radial-gradient(ellipse 60% 60% at 80% 100%, rgba(139,92,246,${isLight ? 0.3 : 0.15}), transparent)`,
+          paths: ["M -100,-100 C 300,200 200,800 600,1100"],
+          extra: null
+        };
+    }
+  };
+
+  const config = getRouteConfig();
+  const isVault = location.pathname === "/";
+
   return (
     <>
       {media && (
-        <div aria-hidden="true" className="fixed inset-0 -z-20 overflow-hidden">
+        <div aria-hidden="true" className={"fixed inset-0 -z-[30] overflow-hidden transition-opacity duration-1000 " + (isVault ? "opacity-100" : "opacity-0")}>
           <video
             className="kenburns h-full w-full object-cover opacity-25"
             src={media.video}
@@ -535,10 +617,55 @@ export default function Background() {
           />
         </div>
       )}
+
+      {/* Dynamic Background Visuals based on Route */}
+      <AnimatePresence>
+        <motion.div 
+          className="fixed inset-0 -z-[25] pointer-events-none"
+          style={{ backgroundImage: `${config.glow1}, ${config.glow2}` }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          key={location.pathname}
+        >
+          {config.extra}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Persistent Left Sidebar Glass Refraction Glow */}
+      <div className="fixed top-0 left-0 w-80 h-full bg-[radial-gradient(ellipse_at_left_center,rgba(99,102,241,0.2),transparent_70%)] opacity-100 -z-[20] pointer-events-none" />
+
+      {/* Scroll-Linked SVG Animation */}
+      <svg className="pointer-events-none fixed inset-0 w-full h-full opacity-50 blur-[3px] -z-[15]" preserveAspectRatio="none" viewBox="0 0 500 1000">
+        {config.paths.map((p, i) => (
+          <motion.path
+            key={`blur-${i}`}
+            d={p}
+            fill="none"
+            stroke={config.color}
+            strokeWidth="6"
+            style={{ pathLength }}
+          />
+        ))}
+      </svg>
+      <svg className="pointer-events-none fixed inset-0 w-full h-full opacity-90 -z-[15]" preserveAspectRatio="none" viewBox="0 0 500 1000">
+        {config.paths.map((p, i) => (
+          <motion.path
+            key={`sharp-${i}`}
+            d={p}
+            fill="none"
+            stroke={config.color}
+            strokeWidth="2"
+            style={{ pathLength }}
+          />
+        ))}
+      </svg>
+
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10"
+        className={"pointer-events-none fixed inset-0 -z-10 transition-opacity duration-1000 " + (isVault ? "opacity-100" : "opacity-0")}
       />
     </>
   );

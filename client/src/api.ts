@@ -360,7 +360,11 @@ async function request<T>(method: string, path: string, body?: unknown, opts: Re
     dispatchDbEvent(`db:${type}`, { table, id: idForPath(path, json), label });
   }
 
-  return (res.status === 204 ? undefined : json) as T;
+  if (res.status === 204) return undefined as T;
+  if (json && typeof json === 'object' && 'data' in json && !('meta' in json)) {
+    return (json as { data: unknown }).data as T;
+  }
+  return json as T;
 }
 
 /* ---------------- public API ---------------- */
@@ -380,8 +384,8 @@ export type CourseListParams = {
 };
 
 export const api = {
-  health: () => request<{ status: string; time: string }>("GET", "/health"),
-  ready: () => request<{ ready: boolean; time: string }>("GET", "/ready"),
+  health: () => request<{ status: string; version: string; uptime: number }>("GET", "/health"),
+  ready: () => request<{ status: string }>("GET", "/ready"),
 
   users: {
     list: (params: UserListParams = {}) => request<ListResponse<User>>("GET", "/users", undefined, { query: params }),
