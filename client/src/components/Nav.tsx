@@ -162,8 +162,10 @@ export default function Nav() {
   const condensedRef = useRef(condensed);
   condensedRef.current = condensed;
   const lockedToSidebarRef = useRef(false);
+  const lastNavTimeRef = useRef(0);
 
   useEffect(() => {
+    lastNavTimeRef.current = Date.now();
     // When navigating, if we are currently in sidebar mode, lock it so it doesn't pop up to navbar on scroll=0
     if (condensedRef.current) {
       lockedToSidebarRef.current = true;
@@ -174,6 +176,9 @@ export default function Nav() {
 
   useEffect(() => {
     const onScroll = () => {
+      // Ignore scroll events for a short window after navigation to prevent trackpad inertia from breaking the lock
+      if (Date.now() - lastNavTimeRef.current < 250) return;
+
       if (window.scrollY > 24) {
         setCondensed(true);
         lockedToSidebarRef.current = false; // release lock once they scroll down manually
