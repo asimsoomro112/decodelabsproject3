@@ -29,7 +29,7 @@ function resolveSsl(connectionString: string): PoolConfig['ssl'] {
   if (lowered.includes('sslmode=require')) return { rejectUnauthorized: false };
   try {
     const host = new URL(connectionString).hostname.toLowerCase();
-    if (host.endsWith('neon.tech') || host.includes('supabase.co')) {
+    if (host.endsWith('neon.tech') || host.includes('supabase.co') || host.includes('supabase.com')) {
       return { rejectUnauthorized: false };
     }
   } catch {
