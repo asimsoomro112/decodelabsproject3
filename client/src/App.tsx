@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import Background from "./components/Background";
 import Nav from "./components/Nav";
 import { Toasts } from "./components/Toasts";
@@ -30,10 +30,19 @@ function RouteFallback() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark">
       <BrowserRouter>
+        <ScrollToTop />
         <div className="relative z-0 min-h-screen w-full">
         <a href="#main" className="skip-link">
           Skip to main content
